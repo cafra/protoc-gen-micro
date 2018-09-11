@@ -157,6 +157,14 @@ func (g *micro) generateService(file *generator.FileDescriptor, service *pb.Serv
 	g.P("}")
 	g.P("}")
 	g.P()
+	g.P(`var svc `, servAlias)
+	g.P(`func Get`, servAlias, "() ", servAlias, "{")
+	g.P("if svc == nil {")
+	g.P("svc = New", servAlias, `("", nil)`)
+	g.P("return svc")
+	g.P("}")
+	g.P("}")
+
 	var methodIndex, streamIndex int
 	serviceDescVar := "_" + servName + "_serviceDesc"
 	// Client method implementations.
