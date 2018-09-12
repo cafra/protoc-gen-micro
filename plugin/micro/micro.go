@@ -163,6 +163,7 @@ func (g *micro) generateService(file *generator.FileDescriptor, service *pb.Serv
 	g.P("svc = New", servAlias, `("", nil)`)
 	g.P("return svc")
 	g.P("}")
+	g.P("return svc")
 	g.P("}")
 
 	var methodIndex, streamIndex int
