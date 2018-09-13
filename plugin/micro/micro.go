@@ -16,6 +16,7 @@ const (
 	contextPkgPath = "context"
 	clientPkgPath  = "github.com/micro/go-micro/client"
 	serverPkgPath  = "github.com/micro/go-micro/server"
+	microPkgPath   = "github.com/micro/go-micro"
 )
 
 func init() {
@@ -40,6 +41,7 @@ var (
 	contextPkg string
 	clientPkg  string
 	serverPkg  string
+	microPkg   string
 )
 
 // Init initializes the plugin.
@@ -48,6 +50,7 @@ func (g *micro) Init(gen *generator.Generator) {
 	contextPkg = generator.RegisterUniquePackageName("context", nil)
 	clientPkg = generator.RegisterUniquePackageName("client", nil)
 	serverPkg = generator.RegisterUniquePackageName("server", nil)
+	microPkg = generator.RegisterUniquePackageName("micro", nil)
 }
 
 // Given a type name defined in a .proto, return its object.
@@ -90,6 +93,7 @@ func (g *micro) GenerateImports(file *generator.FileDescriptor) {
 	g.P(clientPkg, " ", strconv.Quote(path.Join(g.gen.ImportPrefix, clientPkgPath)))
 	g.P(serverPkg, " ", strconv.Quote(path.Join(g.gen.ImportPrefix, serverPkgPath)))
 	g.P(contextPkg, " ", strconv.Quote(path.Join(g.gen.ImportPrefix, contextPkgPath)))
+	g.P(microPkg, " ", strconv.Quote(path.Join(g.gen.ImportPrefix, microPkgPath)))
 	g.P(")")
 	g.P()
 }
@@ -157,10 +161,13 @@ func (g *micro) generateService(file *generator.FileDescriptor, service *pb.Serv
 	g.P("}")
 	g.P("}")
 	g.P()
+	// 获得单例对象
 	g.P(`var svc `, servAlias)
 	g.P(`func Get`, servAlias, "() ", servAlias, "{")
 	g.P("if svc == nil {")
-	g.P("svc = New", servAlias, `("", nil)`)
+	g.P("service := micro.NewService()")
+	g.P("service.Init()")
+	g.P("svc = New", servAlias, `("", service.Client())`)
 	g.P("return svc")
 	g.P("}")
 	g.P("return svc")
